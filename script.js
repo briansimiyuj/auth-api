@@ -2,6 +2,7 @@ import express from "express"
 import dotenv from "dotenv"
 import fs from "fs"
 import logger from "./middleware/logger.js"
+import registerRouter from "./routes/register.js"
 
 dotenv.config()
 
@@ -11,6 +12,8 @@ const app = express(),
 app.use(express.json())
 
 app.use(express.urlencoded({ extended: true }))
+
+app.use("/register", registerRouter)
 
 app.listen(PORT, () =>{
 
