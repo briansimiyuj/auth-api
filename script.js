@@ -4,6 +4,7 @@ import fs from "fs"
 import logger from "./middleware/logger.js"
 import registerRouter from "./routes/register.js"
 import authRouter from "./routes/auth.js"
+import users from "./database/db.json" with { type: "json" }
 
 dotenv.config()
 
@@ -17,6 +18,18 @@ app.use(express.urlencoded({ extended: true }))
 app.use("/register", registerRouter)
 
 app.use("/auth", authRouter)
+
+app.get("/api/users", (req, res) =>{
+
+    const safeUsers = users.map(user => ({ userName: user.userName }))
+
+    logger.emit("log", `Users list accessed — ${safeUsers.length} users`)
+
+    logger.emit("grade", "PART 4 ✅ Users returned without passwords")
+
+    res.status(200).json(safeUsers)
+
+})
 
 app.listen(PORT, () =>{
 
