@@ -7,8 +7,11 @@ import authRouter from "./routes/auth.js"
 import users from "./database/db.json" with { type: "json" }
 import deleteRoute from "./routes/deleteRoute.js"
 import updatePasswordRoute from "./routes/updatePasswordRoute.js"
+import connectDB from "./database/db.js"
 
 dotenv.config()
+
+connectDB()
 
 const app = express(),
     PORT = process.env.PORT || 3000
