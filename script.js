@@ -5,6 +5,7 @@ import logger from "./middleware/logger.js"
 import registerRouter from "./routes/register.js"
 import authRouter from "./routes/auth.js"
 import users from "./database/db.json" with { type: "json" }
+import deleteRoute from "./routes/deleteRoute.js"
 
 dotenv.config()
 
@@ -18,6 +19,8 @@ app.use(express.urlencoded({ extended: true }))
 app.use("/register", registerRouter)
 
 app.use("/auth", authRouter)
+
+app.use("/users/api/", deleteRoute)
 
 app.get("/api/users", (req, res) =>{
 
