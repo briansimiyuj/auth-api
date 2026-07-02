@@ -6,6 +6,7 @@ import registerRouter from "./routes/register.js"
 import authRouter from "./routes/auth.js"
 import users from "./database/db.json" with { type: "json" }
 import deleteRoute from "./routes/deleteRoute.js"
+import updatePasswordRoute from "./routes/updatePasswordRoute.js"
 
 dotenv.config()
 
@@ -21,6 +22,8 @@ app.use("/register", registerRouter)
 app.use("/auth", authRouter)
 
 app.use("/users/api/", deleteRoute)
+
+app.use("/users/", updatePasswordRoute)
 
 app.get("/api/users", (req, res) =>{
 
