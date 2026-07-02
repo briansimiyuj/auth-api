@@ -3,6 +3,7 @@ import dotenv from "dotenv"
 import fs from "fs"
 import logger from "./middleware/logger.js"
 import registerRouter from "./routes/register.js"
+import authRouter from "./routes/auth.js"
 
 dotenv.config()
 
@@ -14,6 +15,8 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 app.use("/register", registerRouter)
+
+app.use("/auth", authRouter)
 
 app.listen(PORT, () =>{
 
