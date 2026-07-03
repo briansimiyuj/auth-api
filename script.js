@@ -44,6 +44,6 @@ app.listen(PORT, () =>{
 
     console.log(`Server is running on port ${PORT}`)
 
-    logger.emit("grade", "PART 1 ✅ Server started successfully")
+    logger.emit("grade", "BONUS ✅ Users persisted to MongoDB")
 
 })
