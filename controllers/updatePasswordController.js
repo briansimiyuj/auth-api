@@ -1,28 +1,16 @@
 import fsPromises from "fs/promises"
 import bcrypt from "bcrypt"
-import { fileURLToPath } from "url"
-import path, { join, dirname } from "path"
 import users from "../database/db.json" with { type: "json" }
 import logger from "../middleware/logger.js"
-
-const __fileName = fileURLToPath(import.meta.url),
-      __dirName = path.dirname(__fileName),
-      dbPath = join(__dirName, "../database/db.json")
-
-const userDB ={
-
-    users: JSON.parse(await fsPromises.readFile(dbPath, "utf-8")),
-    setUsers: function(data){ this.users = data }
-
-}
+import User from "../database/user.js"
 
 const updatePasswordController = async(req, res) =>{
 
-    const { userName, password } = req.body
+    const { email, password } = req.body
 
-    if(!userName){
+    if(!email){
 
-        return res.status(400).json({ "message": "Username is required." })
+        return res.status(400).json({ "message": "Email is required." })
 
     }
 
@@ -32,9 +20,9 @@ const updatePasswordController = async(req, res) =>{
 
     }
 
-    const user = userDB.users.find(user => user.userName === userName)
+    const foundUser = await User.findOne({ email })
 
-    if(!user){
+    if(!foundUser){
 
         return res.status(400).json({ "message": "User not found." })
 
@@ -42,13 +30,15 @@ const updatePasswordController = async(req, res) =>{
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    user.password = hashedPassword
+    foundUser.password = hashedPassword
 
-    await fsPromises.writeFile(dbPath, JSON.stringify(userDB.users))
+    await foundUser.save()
+          .then(result => res.send(result))
+          .catch(err => console.log(err))
 
-    logger.emit("log", `Password updated for user: ${userName}`)
+    logger.emit("log", `Password updated for user: ${userName} via MongoDB`)
 
-    logger.emit("grade", "BONUS ✅ Password updated successfully")
+    logger.emit("grade", "BONUS ✅ Password updated successfully in MongoDB")
 
     res.status(200).json({ "message": `Password updated for user ${userName}.` })
 
