@@ -3,29 +3,19 @@ import fsPromises from "fs/promises"
 import { fileURLToPath } from "url"
 import path, { join, dirname } from "path"
 import logger from "../middleware/logger.js"
-
-const __fileName = fileURLToPath(import.meta.url),
-      __dirName = path.dirname(__fileName),
-      dbPath = join(__dirName, "../database/db.json")
-
-const userDB ={
-
-    users: JSON.parse(await fsPromises.readFile(dbPath, "utf-8")),
-    setUsers: function(data){ this.users = data }
-
-}
+import User from "../database/user.js"
 
 const handleNewUser = async(req, res) =>{
 
-    const { userName, password } = req.body
+    const { userName, email, password } = req.body
 
-    if(!userName || !password){
+    if(!userName || !email || !password){
         
-        return res.status(400).json({ "message": "Username and password are required." })
+        return res.status(400).json({ "message": "Username, email, and password are required." })
 
     }
 
-    const duplicate = userDB.users.find(user => user.userName === userName)
+    const duplicate = await User.findOne({ $and: [{ userName: userName }, { email: email }] }).exec()
 
     if(duplicate){
 
@@ -36,17 +26,19 @@ const handleNewUser = async(req, res) =>{
     try{
     
         const hashedPassword = await bycrypt.hash(password, 10),
-              newUser = { "userName": userName, "password": hashedPassword }
+              newUser = { "userName": userName, "email": email, "password": hashedPassword }
 
-        userDB.users.push(newUser)
+        const user = new User(newUser)
 
-        await fsPromises.writeFile(dbPath, JSON.stringify(userDB.users))
+        user.save()
+            .then(result => res.send(result))
+            .catch(err => console.log(err))
 
         res.status(201).json({ "success": `New user ${userName} created!` })
 
-        logger.emit("log", `New user registered: ${userName}`)
+        logger.emit("log", `New user registered: ${userName} in MongoDB`)
 
-        logger.emit("grade", "PART 2 ✅ User registered with hashed password")
+        logger.emit("grade", "BONUS ✅ New user registered successfully in MongoDB")
 
     
     }catch(e){
