@@ -1,18 +1,18 @@
 import bycrypt from "bcrypt"
 import users from "../database/db.json" with { type: "json" }
-import logger from "../middleware/logger.js"
+import User from "../database/user.js"
 
 const handleSignIn = async(req, res) =>{
 
-    const { userName, password } = req.body
+    const { email, password } = req.body
 
-    if(!userName || !password){
+    if(!email || !password){
 
         return res.status(400).json({ "message": "Username and password are required." })
 
     }
 
-    const foundUser = users.find(user => user.userName === userName)
+    const foundUser = await User.findOne({ email })
 
     if(!foundUser){
 
@@ -30,11 +30,11 @@ const handleSignIn = async(req, res) =>{
 
         }
 
-        res.json({ "message": `Welcome back ${userName}!` })
+        res.json({ "message": `Welcome back ${foundUser.userName}!` })
 
-        logger.emit("log", `User signed in: ${userName}`)
+        logger.emit("log", `User signed in: ${foundUser.userName} via MongoDB`)
 
-        logger.emit("grade", "PART 3 ✅ Login successful with bcrypt password match")
+        logger.emit("grade", "BONUS ✅ User signed in successfully via MongoDB")
     
     }catch(e){
     
